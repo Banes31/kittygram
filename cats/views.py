@@ -1,33 +1,55 @@
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from .models import Cat
 from .serializers import CatSerializer
 
 
-@api_view(['GET', 'POST'])
-def cat_list(request):
+# view-функцию cat_list заменили на view-класс APICat.
+# @api_view(['GET', 'POST'])
+# def cat_list(request):
+#     """В случае POST-запроса создается объект класса Cat.
+#     В случае GET-запроса возвращается информация о всех объектах класса Cat.
+#     """
+#     if request.method == 'POST':
+#         # Создаём объект сериализатора
+#         # и передаём в него данные из POST-запроса
+#         serializer = CatSerializer(data=request.data, many=False)
+#         if serializer.is_valid():
+#             # Если полученные данные валидны —
+#             # сохраняем данные в базу через save().
+#             serializer.save()
+#             # Возвращаем JSON со всеми данными нового объекта
+#             # и статус-код 201
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         # Если данные не прошли валидацию —
+#         # возвращаем информацию об ошибках и соответствующий статус-код:
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#     cats = Cat.objects.all()
+#     serializer = CatSerializer(cats, many=True)
+#     return Response(serializer.data)
+
+class APICat(APIView):
     """В случае POST-запроса создается объект класса Cat.
     В случае GET-запроса возвращается информация о всех объектах класса Cat.
     """
-    if request.method == 'POST':
-        # Создаём объект сериализатора
-        # и передаём в него данные из POST-запроса
-        serializer = CatSerializer(data=request.data, many=False)
+    def get(self, request):
+        """В случае GET-запроса возвращается нижеуказанная информация.
+        О всех объектах класса Cat.
+        """
+        cats = Cat.objects.all()
+        serializer = CatSerializer(cats, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        """В случае POST-запроса создается объект класса Cat."""
+        serializer = CatSerializer(data=request.data)
         if serializer.is_valid():
-            # Если полученные данные валидны —
-            # сохраняем данные в базу через save().
             serializer.save()
-            # Возвращаем JSON со всеми данными нового объекта
-            # и статус-код 201
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        # Если данные не прошли валидацию —
-        # возвращаем информацию об ошибках и соответствующий статус-код:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    cats = Cat.objects.all()
-    serializer = CatSerializer(cats, many=True)
-    return Response(serializer.data)
 
 
 @api_view(['GET', 'POST'])  # Применили декоратор и указали разрешённые методы
