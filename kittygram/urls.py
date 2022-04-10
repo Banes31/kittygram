@@ -1,12 +1,8 @@
-from django.urls import include, path
+from django.urls import path
 
-from cats.views import APICat, cat_detail, hello
+from cats.views import CatList, CatDetail
 
 urlpatterns = [
-   # Исправил код,
-   # ведь синтаксис вызова view-классов отличается
-   # от синтаксиса вызова view-функций.
-   path('cats/', APICat.as_view()),
-   path('hello/', hello),
-   path('cats/<int:pk>/', cat_detail),
+    path('cats/', CatList.as_view()),
+    path('cats/<int:pk>/', CatDetail.as_view()),
 ]
